@@ -1,0 +1,100 @@
+
+<!doctype html><html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nombres — Coincidencias (Wul)</title>
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;background:#0e101a;color:#e8eaf6}
+header{padding:14px 16px;background:#15192c;position:sticky;top:0;z-index:5}
+h1{margin:0 0 8px 0;font-size:18px;font-weight:700}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{padding:8px 12px;border-radius:999px;border:1px solid #2a3466;background:#1b2144;cursor:pointer;font-size:12px}
+.chip.active{background:#2a3b88}.stat{font-size:12px;opacity:.8;margin-left:auto}
+main{min-height:calc(100vh - 120px);display:flex;align-items:center;justify-content:center;padding:24px}
+.card{width:min(760px,94vw);background:#11162c;border:1px solid #273055;border-radius:16px;padding:28px;box-shadow:0 10px 30px rgba(0,0,0,.35);text-align:center}
+.name{font-size:clamp(44px,10vw,88px);line-height:1;font-weight:900;letter-spacing:.5px;margin:20px 0}
+.progress{font-size:12px;opacity:.8}
+.meaning{margin-top:16px;display:none;text-align:left;font-size:14px;background:#0d1430;border:1px dashed #33407a;padding:12px;border-radius:12px}
+.btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+button{font-size:16px;padding:14px 18px;border-radius:999px;border:1px solid #2a3466;background:#1b2144;color:#fff;cursor:pointer;min-width:150px}
+.no{background:#2a1b1b;border-color:#6a2a2a}.yes{background:#1b2a1d;border-color:#2a6a37}
+.next{background:#1b2144}.util{background:#17335f;border-color:#2b5aa4}
+.shortlist{margin-top:16px;text-align:left;font-size:12px}.tag{display:inline-block;margin:4px 6px 0 0;padding:6px 10px;border-radius:999px;background:#20305f}
+.match{display:inline-block;margin-left:8px;padding:4px 8px;background:#1e542f;border-radius:999px;font-size:12px}
+.room{margin:10px 0 0 0;font-size:12px;opacity:.85}
+</style></head><body>
+<header>
+  <h1>🎯 Nombres + coincidencias — <b>Wul</b></h1>
+  <div class="filters" id="filterBox"><span class="stat" id="stat"></span></div>
+  <div class="room" id="roomInfo">Sala: — <button id="share" class="chip">Compartir</button></div>
+</header>
+<main><div class="card">
+  <div class="progress" id="progress">0 / 0</div>
+  <div class="name" id="name">—</div>
+  <div class="meaning" id="meaning"></div>
+  <div class="btns">
+    <button class="no" id="btnNo">👎 No</button>
+    <button class="yes" id="btnYes">❤️ Me gusta</button>
+    <button class="next" id="btnNext">⏭️ Siguiente</button>
+    <button class="util" id="btnExport">⬇️ Exportar shortlist</button>
+  </div>
+  <div class="shortlist" id="shortlistBox"><b>Shortlist:</b> <span id="shortlist"></span></div>
+</div></main>
+
+<script>
+const DATA = [{"name": "Stephanie", "origin": "Griego", "meaning": "corona; laureada"}, {"name": "Alexandra", "origin": "Griego", "meaning": "defensora de los hombres"}, {"name": "Isabella", "origin": "Hebreo/Italiano", "meaning": "Dios es mi juramento"}, {"name": "Gabriella", "origin": "Hebreo/Italiano", "meaning": "Dios es mi fortaleza"}, {"name": "Valentina", "origin": "Latín", "meaning": "fuerte; saludable"}, {"name": "Aurelia", "origin": "Latín", "meaning": "dorada"}, {"name": "Luciana", "origin": "Latín", "meaning": "luz"}, {"name": "Eliana", "origin": "Hebreo/Latín", "meaning": "Dios ha respondido / del sol"}, {"name": "Daniela", "origin": "Hebreo", "meaning": "Dios es mi juez"}, {"name": "Micaela", "origin": "Hebreo", "meaning": "¿quién como Dios?"}, {"name": "Rafaela", "origin": "Hebreo", "meaning": "Dios ha sanado"}, {"name": "Ariel", "origin": "Hebreo", "meaning": "león de Dios"}, {"name": "Yael", "origin": "Hebreo", "meaning": "íbex"}, {"name": "Noa", "origin": "Hebreo", "meaning": "movimiento"}, {"name": "Naomi", "origin": "Hebreo", "meaning": "delicia"}, {"name": "Sarah", "origin": "Hebreo", "meaning": "princesa"}, {"name": "Hannah", "origin": "Hebreo", "meaning": "gracia"}, {"name": "Leah", "origin": "Hebreo", "meaning": "cansancio"}, {"name": "Sofía", "origin": "Griego", "meaning": "sabiduría"}, {"name": "Helena", "origin": "Griego", "meaning": "antorcha; luz"}, {"name": "Ariadna", "origin": "Griego", "meaning": "muy pura"}, {"name": "Irene", "origin": "Griego", "meaning": "paz"}, {"name": "Camila", "origin": "Latín", "meaning": "mensajera; acólita"}, {"name": "Cecilia", "origin": "Latín", "meaning": "humilde ante Dios"}, {"name": "Aurora", "origin": "Latín", "meaning": "amanecer"}, {"name": "Emilia", "origin": "Latín", "meaning": "emuladora; diligente"}, {"name": "Valeria", "origin": "Latín", "meaning": "fuerza"}, {"name": "Olivia", "origin": "Latín", "meaning": "olivo"}, {"name": "Julia", "origin": "Latín", "meaning": "de Julio"}, {"name": "Laura", "origin": "Latín", "meaning": "laurel"}, {"name": "Vera", "origin": "Ruso/Latín", "meaning": "fe / verdadera"}, {"name": "Samara", "origin": "Árabe/Persa", "meaning": "compañera; protegida"}, {"name": "Amira", "origin": "Árabe/Persa", "meaning": "princesa"}, {"name": "Amina", "origin": "Árabe/Persa", "meaning": "confiable"}, {"name": "Laila", "origin": "Árabe/Persa", "meaning": "noche"}, {"name": "Noelle", "origin": "Francés", "meaning": "Navidad"}, {"name": "Amelie", "origin": "Francés", "meaning": "trabajo"}, {"name": "Elodie", "origin": "Francés", "meaning": "perfume del brezal"}, {"name": "Inés", "origin": "Español", "meaning": "pura"}, {"name": "Carmen", "origin": "Español", "meaning": "viña / canto"}, {"name": "Paloma", "origin": "Español", "meaning": "paz"}, {"name": "Rocío", "origin": "Español", "meaning": "rocío"}, {"name": "Emma", "origin": "Germánico", "meaning": "entera; universal"}, {"name": "Luna", "origin": "Internacional", "meaning": "luna"}, {"name": "Chloe", "origin": "Internacional", "meaning": "retoño verde"}, {"name": "Zoe", "origin": "Internacional", "meaning": "vida"}, {"name": "Ava", "origin": "Internacional", "meaning": "ave/vida"}, {"name": "Nora", "origin": "Internacional", "meaning": "honor, luz"}, {"name": "Stella", "origin": "Internacional", "meaning": "estrella"}];
+const PRE  = ["Hebreo","Latín","Griego","Francés","Árabe/Persa","Español","Internacional"];
+const filterBox=document.getElementById('filterBox'),stat=document.getElementById('stat');
+const nameEl=document.getElementById('name'),meaningEl=document.getElementById('meaning'),progressEl=document.getElementById('progress');
+const shortlistSpan=document.getElementById('shortlist'),shareBtn=document.getElementById('share');
+let active=new Set(PRE),pool=[],idx=-1,shortlist=[],matches=new Set();
+const infoMap=Object.fromEntries(DATA.map(x=>[x.name.toLowerCase(),x]));
+function drawChips(){ Array.from(filterBox.querySelectorAll('.chip')).forEach(el=>el.remove());
+ const add=(label,on,fn)=>{const el=document.createElement('span'); el.className='chip'+(on?' active':''); el.textContent=label; el.onclick=fn; filterBox.insertBefore(el,stat);};
+ const all=[...new Set(DATA.map(x=>x.origin.split(' · ')).flat())].sort();
+ add('Todos',active.size===0,()=>{active.clear(); rebuild(); drawChips();});
+ all.forEach(o=>add(o,active.has(o),()=>{ active.has(o)?active.delete(o):active.add(o); rebuild(); drawChips(); }));
+}
+function shuf(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
+function upd(){progressEl.textContent=(idx+1)+' / '+pool.length;}
+function show(i){ idx=i; if(idx>=pool.length){nameEl.textContent='—'; meaningEl.style.display='none'; progressEl.textContent='Fin de la lista'; return;}
+ const n=pool[idx]; nameEl.textContent=n; meaningEl.style.display='none'; upd(); }
+function drawShortlist(){ shortlistSpan.innerHTML=''; shortlist.forEach(x=>{const t=document.createElement('span'); t.className='tag'; t.textContent=x.name; if(matches.has(x.name)){const m=document.createElement('span'); m.className='match'; m.textContent='¡Coincidencia!'; t.appendChild(m);} t.title=(x.origin?x.origin+' · ':'')+(x.meaning||''); shortlistSpan.appendChild(t); }); }
+function rebuild(){ pool=DATA.filter(x=>{ if(active.size===0) return true; const os=x.origin.split(' · '); for(const o of os) if(active.has(o)) return true; return false; }).map(x=>x.name);
+ shuf(pool); idx=-1; shortlist=[]; drawShortlist(); show(0); stat.textContent=pool.length+' nombres'; }
+function like(){ if(idx<0||idx>=pool.length) return; const n=pool[idx],info=infoMap[n.toLowerCase()]||{origin:'',meaning:''};
+ meaningEl.innerHTML='<b>Origen:</b> '+(info.origin||'—')+'<br><b>Significado:</b> '+(info.meaning||'<i>a completar</i>'); meaningEl.style.display='block';
+ if(!shortlist.find(x=>x.name===n)) shortlist.push({name:n,origin:info.origin,meaning:info.meaning}); drawShortlist(); if(window.vote) window.vote(n).catch(()=>{}); }
+function next(){ show(idx+1);} function dislike(){ next(); }
+document.getElementById('btnNo').onclick=dislike; document.getElementById('btnYes').onclick=like; document.getElementById('btnNext').onclick=next;
+document.getElementById('btnExport').onclick=()=>{ const rows=[['name','origin','meaning']].concat(shortlist.map(x=>[x.name,x.origin,x.meaning]));
+ const csv=rows.map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob);
+ const a=document.createElement('a'); a.href=url; a.download='shortlist_nombres_wul.csv'; a.click(); URL.revokeObjectURL(url); };
+document.addEventListener('keydown',e=>{ if(e.key==='ArrowLeft')dislike(); else if(e.key==='ArrowRight')next(); else if(e.key==='Enter'||e.code==='Space'){e.preventDefault(); like();} });
+function room(){ let r=new URL(location.href).searchParams.get('room'); if(!r){ r=Math.random().toString(36).slice(2,8).toUpperCase(); const u=new URL(location.href); u.searchParams.set('room',r); history.replaceState(null,'',u.toString()); } return r; }
+document.getElementById('roomInfo').firstChild.textContent='Sala: '+room();
+shareBtn.onclick=async()=>{ try{ await navigator.share({title:'Nombres — Wul',text:'Entrá a mi sala',url:location.href}); }catch(e){ navigator.clipboard.writeText(location.href); shareBtn.textContent='Copiado ✅'; setTimeout(()=>shareBtn.textContent='Compartir',1500);} };
+drawChips(); rebuild();
+
+// ==== Firebase (anon auth + Firestore) ====
+const firebaseConfig = {"apiKey": "AIzaSyDBfgPugJkcCDFNOwKxPmEaqUhZY2BYQAQ", "authDomain": "nombre-e9ee9.firebaseapp.com", "projectId": "nombre-e9ee9", "storageBucket": "nombre-e9ee9.firebasestorage.app", "messagingSenderId": "766233076521", "appId": "1:766233076521:web:30d6130807965be5eb0d38"};
+(function(){
+  const s1=document.createElement('script'); s1.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js';
+  const s2=document.createElement('script'); s2.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js';
+  const s3=document.createElement('script'); s3.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js';
+  s3.onload = () => {
+    const app=firebase.initializeApp(firebaseConfig);
+    const auth=firebase.auth(); const db=firebase.firestore();
+    auth.signInAnonymously().catch(()=>{});
+    const rm = new URL(location.href).searchParams.get('room');
+    window.vote = async (name)=>{ try{ await db.collection('votes').add({room:rm,name,ts:firebase.firestore.FieldValue.serverTimestamp()}); }catch(e){} };
+    db.collection('votes').where('room','==',rm).onSnapshot(snap=>{
+      const per=new Map();
+      snap.forEach(d=>{const v=d.data(); const set=per.get(v.name)||0; per.set(v.name,set+1);});
+      matches.clear(); per.forEach((cnt,n)=>{ if(cnt>=2) matches.add(n);});
+      drawShortlist(); const cur=pool[idx]; if(cur) nameEl.textContent=cur;
+    });
+  };
+  document.head.appendChild(s1); document.head.appendChild(s2); document.head.appendChild(s3);
+})();
+</script>
+</body></html>
